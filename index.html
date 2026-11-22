@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ecocure — A living atlas of the wild</title>
+  <meta name="description" content="Ecocure is a biodiversity field station. Wander a living 3D forest, meet its plants and animals, and explore the small ecologies that hold a landscape together." />
+  <meta name="theme-color" content="#070d0a" />
+  <meta property="og:title" content="Ecocure — A living atlas of the wild" />
+  <meta property="og:description" content="A 3D field station for the more-than-human world. Plants, animals, fungi and the places they share." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23070d0a'/%3E%3Cpath d='M32 51c0-13 4-23 15-29-1 14-6 23-15 29Zm0 0C32 38 28 28 17 22c1 14 6 23 15 29Z' fill='%23b9d48f'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="./css/style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.mjs"
+      }
+    }
+  </script>
+  <noscript>
+    <style>
+      .loader { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+</head>
+<body>
+  <a class="skip-link" href="#flora">Skip to content</a>
+
+  <div class="scene" aria-hidden="true">
+    <canvas id="world"></canvas>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Ecocure — back to top">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 27c0-7.2 2.2-12.7 8.2-16-.6 7.8-3.4 12.7-8.2 16Zm0 0C16 19.8 13.8 14.3 7.8 11c.6 7.8 3.4 12.7 8.2 16Z" fill="currentColor"/>
+        <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor" stroke-opacity=".28"/>
+      </svg>
+      <span class="brand__word">Ecocure</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <a href="#flora">Flora</a>
+      <a href="#fauna">Fauna</a>
+      <a href="#understory">Understory</a>
+      <a href="#care">Care</a>
+      <a href="#index">Field index</a>
+    </nav>
+
+    <div class="site-header__right">
+      <span class="live"><span class="live__dot" aria-hidden="true"></span><span id="station-time">Field station · live</span></span>
+      <a class="btn btn--small" href="#index">Enter the field <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <div class="rail" aria-hidden="true">
+    <div class="rail__track"><span class="rail__fill" id="rail-fill"></span></div>
+    <ol class="rail__labels" id="rail-labels">
+      <li data-step="0" class="is-active">Aperture</li>
+      <li data-step="1">Flora</li>
+      <li data-step="2">Fauna</li>
+      <li data-step="3">Understory</li>
+      <li data-step="4">Care</li>
+      <li data-step="5">Index</li>
+    </ol>
+  </div>
+
+  <main id="content">
+    <!-- 00 — HERO -->
+    <section class="chapter hero" id="top">
+      <div class="chapter__inner hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow reveal"><span class="eyebrow__dot" aria-hidden="true"></span>Biodiversity field station · est. 2019</p>
+          <h1 class="reveal" data-delay="1">A living atlas<br />of the <em>wild</em>.</h1>
+          <p class="lede reveal" data-delay="2">
+            Ecocure maps the small ecologies that hold a landscape together — the oak and the owl,
+            the fungus and the fox — and gives them room to return.
+          </p>
+          <div class="hero__actions reveal" data-delay="3">
+            <a class="btn" href="#flora">Wander the island <span class="btn__arrow" aria-hidden="true">↓</span></a>
+            <a class="link" href="#care">Read our field notes <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+
+        <div class="hero__foot reveal" data-delay="4">
+          <a class="scroll-cue" href="#flora">
+            <span class="scroll-cue__line" aria-hidden="true"></span>
+            <span>Scroll to wander</span>
+          </a>
+          <dl class="hero__meta">
+            <div><dt>Coordinates</dt><dd>47.3769° N, 8.5417° E</dd></div>
+            <div><dt>Species recorded</dt><dd><span data-count="1284">1,284</span></dd></div>
+            <div><dt>Land under care</dt><dd><span data-count="12400">12,400</span> ha</dd></div>
+          </dl>
+          <p class="hero__hint">Drag your cursor to look around.<br />Click a marker to open a field note.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 — FLORA -->
+    <section class="chapter chapter--right" id="flora" data-chapter="1">
+      <div class="chapter__inner">
+        <div class="chapter__copy">
+          <p class="chapter__no reveal"><span>01</span> Flora</p>
+          <h2 class="reveal">The quiet<br /><em>architects.</em></h2>
+          <p class="body reveal" data-delay="1">
+            Plants make the air, the shade and the soil. A single mature oak can host more than two
+            thousand species — an entire ecosystem wearing bark. We survey them crown to root,
+            then let the woodland close around them.
+          </p>
+          <div class="stats reveal" data-delay="2">
+            <div class="stat"><span class="stat__num">80<small>%</small></span><span class="stat__label">of terrestrial biomass is plant life</span></div>
+            <div class="stat"><span class="stat__num">2,300</span><span class="stat__label">species can live on one old oak</span></div>
+          </div>
+        </div>
+
+        <button class="species-card reveal" data-delay="2" data-species="oak" type="button">
+          <span class="species-card__tag"><span class="pulse" aria-hidden="true"></span>Keystone species</span>
+          <span class="species-card__name">English oak</span>
+          <span class="species-card__latin">Quercus robur</span>
+          <span class="species-card__meta">Oldest resident · 340 years</span>
+          <span class="species-card__cta">Open field note <span aria-hidden="true">↗</span></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 02 — FAUNA -->
+    <section class="chapter" id="fauna" data-chapter="2">
+      <div class="chapter__inner">
+        <div class="chapter__copy">
+          <p class="chapter__no reveal"><span>02</span> Fauna</p>
+          <h2 class="reveal">The ones who<br /><em>carry the seed.</em></h2>
+          <p class="body reveal" data-delay="1">
+            Animals are the forest's couriers. A fox carries burrs in its coat; a deer prunes the
+            understory; a blackbird drops a berry a kilometre away. Every movement is a small act
+            of planting — which is why we map the paths, not just the species.
+          </p>
+          <div class="stats reveal" data-delay="2">
+            <div class="stat"><span class="stat__num">38</span><span class="stat__label">wildlife corridors mapped and protected</span></div>
+            <div class="stat"><span class="stat__num">214</span><span class="stat__label">species on the station's nightly survey</span></div>
+          </div>
+        </div>
+
+        <div class="card-stack reveal" data-delay="2">
+          <button class="species-card species-card--slim" data-species="deer" type="button">
+            <span class="species-card__tag"><span class="pulse" aria-hidden="true"></span>Resident</span>
+            <span class="species-card__name">Roe deer</span>
+            <span class="species-card__latin">Capreolus capreolus</span>
+            <span class="species-card__cta">Open field note <span aria-hidden="true">↗</span></span>
+          </button>
+          <button class="species-card species-card--slim" data-species="fox" type="button">
+            <span class="species-card__tag"><span class="pulse pulse--amber" aria-hidden="true"></span>Night shift</span>
+            <span class="species-card__name">Red fox</span>
+            <span class="species-card__latin">Vulpes vulpes</span>
+            <span class="species-card__cta">Open field note <span aria-hidden="true">↗</span></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 — UNDERSTORY -->
+    <section class="chapter chapter--right" id="understory" data-chapter="3">
+      <div class="chapter__inner">
+        <div class="chapter__copy">
+          <p class="chapter__no reveal"><span>03</span> Understory</p>
+          <h2 class="reveal">The internet is<br /><em>older than us.</em></h2>
+          <p class="body reveal" data-delay="1">
+            Beneath the leaf litter, fungal threads trade water, carbon and warning signals between
+            trees. Ninety percent of land plants live in partnership with fungi. The forest has been
+            networked for four hundred million years — we are late to the conversation.
+          </p>
+          <div class="stats reveal" data-delay="2">
+            <div class="stat"><span class="stat__num">400<small>M</small></span><span class="stat__label">years of mycorrhizal partnership</span></div>
+            <div class="stat"><span class="stat__num">90<small>%</small></span><span class="stat__label">of land plants depend on fungal partners</span></div>
+          </div>
+        </div>
+
+        <button class="species-card reveal" data-delay="2" data-species="fungi" type="button">
+          <span class="species-card__tag"><span class="pulse pulse--teal" aria-hidden="true"></span>Decomposer</span>
+          <span class="species-card__name">Turkey tail</span>
+          <span class="species-card__latin">Trametes versicolor</span>
+          <span class="species-card__meta">Wood-wide messenger · all year</span>
+          <span class="species-card__cta">Open field note <span aria-hidden="true">↗</span></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 04 — CARE -->
+    <section class="chapter chapter--center" id="care" data-chapter="4">
+      <div class="chapter__inner">
+        <div class="chapter__copy">
+          <p class="chapter__no reveal"><span>04</span> Care</p>
+          <h2 class="reveal">Rewilding,<br /><em>measured.</em></h2>
+          <p class="body body--wide reveal" data-delay="1">
+            We buy the marginal field, remove the drain, plant the thorn and wait. Then we count —
+            beetles, bats, mycorrhizae, night sound. Care is not a gesture. It is a practice of
+            attention, repeated until the place can look after itself.
+          </p>
+          <div class="stats stats--three reveal" data-delay="2">
+            <div class="stat"><span class="stat__num" data-count="12400">12,400</span><span class="stat__label">hectares in restoration</span></div>
+            <div class="stat"><span class="stat__num" data-count="214">214</span><span class="stat__label">partner farms &amp; guardians</span></div>
+            <div class="stat"><span class="stat__num" data-count="96">96</span><span class="stat__label">percent sapling survival</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — FIELD INDEX -->
+    <section class="chapter index-section" id="index" data-chapter="5">
+      <div class="chapter__inner">
+        <div class="index-head">
+          <div>
+            <p class="chapter__no reveal"><span>05</span> Field index</p>
+            <h2 class="reveal">Six lives from<br />the <em>same place.</em></h2>
+          </div>
+          <p class="body index-head__note reveal" data-delay="1">
+            A working list, not a museum catalogue. Each entry is observed, counted and revisited
+            by the station's volunteers. Open a note to read what we know so far.
+          </p>
+        </div>
+
+        <div class="index-list reveal" data-delay="2">
+          <button class="index-row" data-species="oak" type="button">
+            <span class="index-row__no">001</span>
+            <span class="index-row__name">English oak</span>
+            <span class="index-row__latin">Quercus robur</span>
+            <span class="index-row__group">Flora</span>
+            <span class="index-row__status">Keystone</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button class="index-row" data-species="deer" type="button">
+            <span class="index-row__no">002</span>
+            <span class="index-row__name">Roe deer</span>
+            <span class="index-row__latin">Capreolus capreolus</span>
+            <span class="index-row__group">Fauna</span>
+            <span class="index-row__status">Resident</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button class="index-row" data-species="fox" type="button">
+            <span class="index-row__no">003</span>
+            <span class="index-row__name">Red fox</span>
+            <span class="index-row__latin">Vulpes vulpes</span>
+            <span class="index-row__group">Fauna</span>
+            <span class="index-row__status">Night shift</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button class="index-row" data-species="fungi" type="button">
+            <span class="index-row__no">004</span>
+            <span class="index-row__name">Turkey tail</span>
+            <span class="index-row__latin">Trametes versicolor</span>
+            <span class="index-row__group">Fungi</span>
+            <span class="index-row__status">Decomposer</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button class="index-row" data-species="swallowtail" type="button">
+            <span class="index-row__no">005</span>
+            <span class="index-row__name">Swallowtail</span>
+            <span class="index-row__latin">Papilio machaon</span>
+            <span class="index-row__group">Insect</span>
+            <span class="index-row__status">Returning</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button class="index-row" data-species="crane" type="button">
+            <span class="index-row__no">006</span>
+            <span class="index-row__name">Common crane</span>
+            <span class="index-row__latin">Grus grus</span>
+            <span class="index-row__group">Bird</span>
+            <span class="index-row__status">Passage</span>
+            <span class="index-row__arrow" aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <div class="cta-band reveal" data-delay="3">
+          <div>
+            <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>Join the station</p>
+            <h3>Build a wilder place<br />with us.</h3>
+          </div>
+          <form class="signup" id="signup" novalidate>
+            <label class="visually-hidden" for="email">Email address</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@somewhere.wild" required />
+            <button class="btn" type="submit">Get the field notes <span aria-hidden="true">↗</span></button>
+            <p class="signup__note" id="signup-note" role="status">One letter a season. No noise, no tracking.</p>
+          </form>
+        </div>
+      </div>
+
+      <footer class="site-footer">
+        <div class="site-footer__top">
+          <a class="brand brand--footer" href="#top">
+            <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M16 27c0-7.2 2.2-12.7 8.2-16-.6 7.8-3.4 12.7-8.2 16Zm0 0C16 19.8 13.8 14.3 7.8 11c.6 7.8 3.4 12.7 8.2 16Z" fill="currentColor"/>
+              <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor" stroke-opacity=".28"/>
+            </svg>
+            <span class="brand__word">Ecocure</span>
+          </a>
+          <p class="site-footer__line">Field station 07 · Zürich, Switzerland<br />47.3769° N, 8.5417° E</p>
+          <nav class="site-footer__nav" aria-label="Footer">
+            <a href="#flora">Flora</a>
+            <a href="#fauna">Fauna</a>
+            <a href="#understory">Understory</a>
+            <a href="#care">Care</a>
+            <a href="#index">Field index</a>
+          </nav>
+        </div>
+        <div class="site-footer__bottom">
+          <p>© 2026 Ecocure. A demonstration site for the more-than-human world.</p>
+          <p>Low-poly world built with Three.js · Type set in Instrument Serif &amp; Inter Tight</p>
+          <p class="site-footer__credit">Reference notes: Hybrid by Nature, Park Photos — composition only.</p>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- 3D hotspots -->
+  <div class="hotspots" id="hotspots" aria-label="Species in the scene">
+    <button class="hotspot" type="button" data-hotspot="oak" data-species="oak" aria-label="Field note: English oak">
+      <span class="hotspot__dot" aria-hidden="true"></span>
+      <span class="hotspot__label"><b>Flora</b> English oak</span>
+    </button>
+    <button class="hotspot" type="button" data-hotspot="deer" data-species="deer" aria-label="Field note: Roe deer">
+      <span class="hotspot__dot" aria-hidden="true"></span>
+      <span class="hotspot__label"><b>Fauna</b> Roe deer</span>
+    </button>
+    <button class="hotspot" type="button" data-hotspot="fungi" data-species="fungi" aria-label="Field note: Turkey tail">
+      <span class="hotspot__dot" aria-hidden="true"></span>
+      <span class="hotspot__label"><b>Fungi</b> Turkey tail</span>
+    </button>
+  </div>
+
+  <!-- Species panel -->
+  <aside class="panel" id="panel" aria-hidden="true" aria-labelledby="panel-name" role="dialog" aria-modal="false">
+    <div class="panel__head">
+      <p class="panel__kicker" id="panel-group">Field note · Flora</p>
+      <button class="panel__close" id="panel-close" type="button" aria-label="Close field note">Close <span aria-hidden="true">✕</span></button>
+    </div>
+    <div class="panel__body" data-lenis-prevent>
+      <p class="panel__latin" id="panel-latin">Quercus robur</p>
+      <h2 class="panel__name" id="panel-name">English oak</h2>
+      <p class="panel__desc" id="panel-desc"></p>
+      <dl class="panel__facts" id="panel-facts"></dl>
+      <p class="panel__coords" id="panel-coords"></p>
+      <button class="panel__action" id="panel-action" type="button">Find it on the island <span aria-hidden="true">◎</span></button>
+    </div>
+    <p class="panel__foot">Ecocure field note · observed on site</p>
+  </aside>
+
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span></div>
+
+  <div class="loader" id="loader">
+    <div class="loader__inner">
+      <div class="loader__brand">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 27c0-7.2 2.2-12.7 8.2-16-.6 7.8-3.4 12.7-8.2 16Zm0 0C16 19.8 13.8 14.3 7.8 11c.6 7.8 3.4 12.7 8.2 16Z" fill="currentColor"/>
+          <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor" stroke-opacity=".28"/>
+        </svg>
+        <span>Ecocure</span>
+      </div>
+      <p class="loader__status">Growing the island</p>
+      <div class="loader__bar"><span id="loader-fill"></span></div>
+      <div class="loader__meta"><span>Field station 07</span><span id="loader-pct">0%</span></div>
+    </div>
+    <p class="loader__fallback" id="fallback" hidden>
+      Your browser could not start WebGL. The field notes below are still readable — the island will wait.
+    </p>
+  </div>
+
+  <noscript>
+    <div class="noscript">Ecocure works best with JavaScript and WebGL. The field notes and species index remain readable without them.</div>
+  </noscript>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
