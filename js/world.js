@@ -15,27 +15,27 @@ import { buildCreatures } from "./creatures.js";
    ------------------------------------------------------------ */
 
 const STOPS = [
-  { pos: [14, 7.2, 18], look: [-1.0, -0.2, 0], fov: 40 },
-  { pos: [2.4, 3.2, 6.6], look: [-1.6, 2.9, -1.2], fov: 42 },
-  { pos: [4.6, 2.0, 5.4], look: [-1.8, 1.2, 0.4], fov: 40 },
-  { pos: [2.2, 1.05, 5.2], look: [0.4, 0.5, 2.2], fov: 46 },
-  { pos: [-16, 10, 18], look: [0, -0.5, 0], fov: 38 },
-  { pos: [0, 13, 24], look: [0, -0.4, 0], fov: 36 },
+  { pos: [18, 6.0, 24], look: [0, 0.1, 0], fov: 38 },
+  { pos: [-8.6, 4.2, 9.6], look: [-3.0, 3.2, -1.2], fov: 40 },
+  { pos: [9.4, 3.4, 10.6], look: [0.6, 1.2, 0.4], fov: 38 },
+  { pos: [-2.5, 2.6, 8.6], look: [-1.2, 0.7, 2.7], fov: 42 },
+  { pos: [-18, 11, 20], look: [0, -0.4, 0], fov: 38 },
+  { pos: [0, 15, 26], look: [0, -0.2, 0], fov: 36 },
 ];
 
 const FOCUS = {
-  oak: { pos: [1.8, 3.6, 4.8], look: [-3.1, 3.2, -1.2], fov: 42 },
-  deer: { pos: [3.2, 2.0, 3.8], look: [0.5, 1.1, 0.5], fov: 40 },
-  fungi: { pos: [0.9, 1.0, 4.6], look: [-1.2, 0.35, 2.6], fov: 44 },
-  fox: { pos: [7.4, 2.2, 2.4], look: [5.3, 0.9, -0.9], fov: 40 },
+  oak: { pos: [4.2, 4.4, 7.2], look: [-3.0, 3.2, -1.2], fov: 40 },
+  deer: { pos: [5.6, 2.2, 5.2], look: [0.7, 1.1, 0.5], fov: 38 },
+  fungi: { pos: [2.0, 1.4, 5.6], look: [-1.2, 0.5, 2.7], fov: 42 },
+  fox: { pos: [8.2, 2.4, 3.2], look: [5.3, 0.9, -0.9], fov: 38 },
 };
 
 const DAY = {
   top: new THREE.Color(0x0e2a22),
-  mid: new THREE.Color(0x2b4d38),
-  bottom: new THREE.Color(0x6f7048),
-  fog: new THREE.Color(0x0e1b15),
-  sun: new THREE.Color(0xffd9a3),
+  mid: new THREE.Color(0x3f5a3e),
+  bottom: new THREE.Color(0x94885a),
+  fog: new THREE.Color(0x111e17),
+  sun: new THREE.Color(0xffd2a0),
 };
 
 const NIGHT = {
@@ -155,7 +155,7 @@ export class EcocureWorld {
       uMid: { value: DAY.mid.clone() },
       uBottom: { value: DAY.bottom.clone() },
       uSunColor: { value: DAY.sun.clone() },
-      uSunDir: { value: new THREE.Vector3(-13, 16, -10).normalize() },
+      uSunDir: { value: new THREE.Vector3(-10, 18, 16).normalize() },
     };
     const mat = new THREE.ShaderMaterial({
       side: THREE.BackSide,
@@ -194,11 +194,11 @@ export class EcocureWorld {
   }
 
   buildLights() {
-    this.hemi = new THREE.HemisphereLight(0xa8c9b4, 0x141c13, 1.0);
+    this.hemi = new THREE.HemisphereLight(0xb6d2bb, 0x1a241b, 1.18);
     this.scene.add(this.hemi);
 
-    this.sun = new THREE.DirectionalLight(0xffd6a0, 2.3);
-    this.sun.position.set(-13, 16, -10);
+    this.sun = new THREE.DirectionalLight(0xffd0a0, 2.55);
+    this.sun.position.set(-10, 18, 16);
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(this.mobile ? 1024 : 2048, this.mobile ? 1024 : 2048);
     this.sun.shadow.camera.left = -16;
@@ -213,9 +213,21 @@ export class EcocureWorld {
     this.sun.target.position.set(0, 0, 0);
     this.scene.add(this.sun.target);
 
-    this.fill = new THREE.DirectionalLight(0x7fa7c9, 0.45);
+    this.fill = new THREE.DirectionalLight(0x7fa7c9, 0.5);
     this.fill.position.set(10, 7, 12);
     this.scene.add(this.fill);
+
+    // A cool uplight keeps the rock underside readable against the sky.
+    this.under = new THREE.DirectionalLight(0x9fceb0, 2.0);
+    this.under.position.set(2, -14, 10);
+    this.under.target.position.set(0, -2, 0);
+    this.scene.add(this.under);
+    this.scene.add(this.under.target);
+
+    // Warm rim from behind the island.
+    this.rim = new THREE.DirectionalLight(0xffc78f, 0.55);
+    this.rim.position.set(0, 5, -18);
+    this.scene.add(this.rim);
   }
 
   buildPost() {
@@ -330,11 +342,13 @@ export class EcocureWorld {
     u.uSunColor.value.lerpColors(DAY.sun, NIGHT.sun, this.night);
 
     this.scene.fog.color.lerpColors(DAY.fog, NIGHT.fog, this.night);
-    this.scene.fog.density = 0.017 + this.night * 0.005;
-    this.sun.intensity = 2.3 - this.night * 1.15;
-    this.hemi.intensity = 1.0 - this.night * 0.32;
-    this.fill.intensity = 0.45 + this.night * 0.2;
-    this.renderer.toneMappingExposure = 1.02 - this.night * 0.08;
+    this.scene.fog.density = 0.016 + this.night * 0.006;
+    this.sun.intensity = 2.55 - this.night * 1.2;
+    this.hemi.intensity = 1.18 - this.night * 0.38;
+    this.fill.intensity = 0.5 + this.night * 0.2;
+    this.under.intensity = 2.0 - this.night * 0.35;
+    this.rim.intensity = 0.55 + this.night * 0.15;
+    this.renderer.toneMappingExposure = 1.04 - this.night * 0.08;
   }
 
   updateHotspots() {

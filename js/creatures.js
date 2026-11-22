@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { POND, surfaceHeight, std } from "./util.js";
+import { POND, radialTexture, surfaceHeight, std } from "./util.js";
 
 /* ------------------------------------------------------------
    Creatures & atmosphere: roe deer and fawn, a sitting fox,
@@ -337,10 +337,11 @@ function createFireflies(scene, rng, count) {
   geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   const mat = new THREE.PointsMaterial({
     color: 0xffe6a8,
-    size: 0.14,
-    map: null,
+    size: 0.11,
+    map: radialTexture(),
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.2,
+    alphaTest: 0.01,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     sizeAttenuation: true,
@@ -364,9 +365,11 @@ function createPollen(scene, rng, count) {
   geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   const mat = new THREE.PointsMaterial({
     color: 0xe8efd8,
-    size: 0.035,
+    size: 0.028,
+    map: radialTexture(),
     transparent: true,
-    opacity: 0.4,
+    opacity: 0.34,
+    alphaTest: 0.01,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     sizeAttenuation: true,
@@ -461,17 +464,17 @@ export function buildCreatures(scene, rng, mats) {
   // Birds.
   const birds = [];
   for (let i = 0; i < 5; i++) {
-    const bird = createBird(mats, i % 2 ? 0x35453b : 0x2b3830);
-    const radius = 5.5 + rng() * 4;
+    const bird = createBird(mats, i % 2 ? 0x3d4f43 : 0x33443a);
+    const radius = 6.5 + rng() * 4;
     bird.userData.orbit = {
       radius,
-      y: 5.2 + rng() * 3.2,
-      speed: 0.09 + rng() * 0.06,
+      y: 6.6 + rng() * 3.4,
+      speed: 0.08 + rng() * 0.05,
       phase: rng() * Math.PI * 2,
       cx: -0.5,
       cz: -0.8,
     };
-    bird.scale.setScalar(1.3 + rng() * 0.5);
+    bird.scale.setScalar(0.9 + rng() * 0.35);
     group.add(bird);
     birds.push(bird);
   }
@@ -513,18 +516,6 @@ export function buildCreatures(scene, rng, mats) {
     islet.userData.phase = rng() * Math.PI * 2;
     group.add(islet);
     islets.push(islet);
-  }
-
-  // Slow clouds / mist banks.
-  const clouds = [];
-  for (let i = 0; i < 3; i++) {
-    const cloud = createCloud(rng, mats);
-    const a = rng() * Math.PI * 2;
-    cloud.position.set(Math.cos(a) * 18, 6 + rng() * 3, Math.sin(a) * 18);
-    cloud.rotation.y = rng() * Math.PI;
-    cloud.userData.phase = rng() * Math.PI * 2;
-    group.add(cloud);
-    clouds.push(cloud);
   }
 
   scene.add(group);
@@ -598,18 +589,13 @@ export function buildCreatures(scene, rng, mats) {
         pos[i * 3 + 2] = f.z + Math.sin(a) * 0.35;
       });
       fireflies.points.geometry.attributes.position.needsUpdate = true;
-      fireflies.mat.opacity = 0.55 + night * 0.4 + Math.sin(t * 1.7) * 0.06;
+      fireflies.mat.opacity = 0.05 + night * 0.9 + Math.sin(t * 1.7) * 0.04;
 
       pollen.rotation.y = t * 0.008;
 
       for (const islet of islets) {
         islet.position.y = islet.userData.baseY + Math.sin(t * 0.35 + islet.userData.phase) * 0.18;
         islet.rotation.y = t * 0.01 + islet.userData.phase;
-      }
-
-      for (const cloud of clouds) {
-        cloud.position.y += Math.sin(t * 0.1 + cloud.userData.phase) * 0.0006;
-        cloud.rotation.y += 0.00015;
       }
     },
     // World-space anchors for the DOM markers.

@@ -80,27 +80,59 @@ function islandGeometry(rng) {
 }
 
 function rockGeometry(rng) {
-  const g = new THREE.ConeGeometry(ISLAND_R * 0.995, 8, 20, 5);
+  const g = new THREE.ConeGeometry(ISLAND_R * 1.01, 9.4, 24, 7, true);
   g.rotateX(Math.PI);
   const pos = g.attributes.position;
   const colors = [];
-  const top = new THREE.Color("#4a5340");
-  const bottom = new THREE.Color("#26251f");
+  const top = new THREE.Color("#8b846b");
+  const mid = new THREE.Color("#625f4f");
+  const bottom = new THREE.Color("#3b3931");
   const tmp = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
     const y = pos.getY(i);
     const a = Math.atan2(pos.getZ(i), pos.getX(i));
-    const jag = 1 + Math.sin(a * 7 + y) * 0.045 + (rng() - 0.5) * 0.03;
+    const edge = THREE.MathUtils.smoothstep(y, -4.2, 4.2);
+    const jag =
+      1 +
+      Math.sin(a * 6 + y * 0.8) * 0.07 +
+      Math.sin(a * 13 - y * 0.45) * 0.035 +
+      (rng() - 0.5) * 0.09 * (1 - edge * 0.35);
     pos.setX(i, pos.getX(i) * jag);
     pos.setZ(i, pos.getZ(i) * jag);
-    const t = THREE.MathUtils.clamp((y + 4) / 8, 0, 1);
-    tmp.copy(bottom).lerp(top, Math.pow(t, 1.8));
+    pos.setY(i, y + (rng() - 0.5) * 0.16);
+
+    const t = THREE.MathUtils.clamp((y + 4.7) / 9.4, 0, 1);
+    if (t < 0.5) tmp.copy(bottom).lerp(mid, t * 2);
+    else tmp.copy(mid).lerp(top, (t - 0.5) * 2);
     colors.push(tmp.r, tmp.g, tmp.b);
   }
   g.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   g.computeVertexNormals();
   return g;
+}
+
+function addFloatingRocks(group, rng, mats) {
+  const rocks = [];
+  const spots = [
+    [-9.8, -2.2, 4.2, 0.42],
+    [8.6, -3.8, 6.4, 0.3],
+    [-6.8, -5.6, -7.8, 0.28],
+    [10.8, -1.4, -3.6, 0.24],
+    [-11.4, -1.1, -2.2, 0.2],
+    [4.6, -6.8, -8.4, 0.32],
+  ];
+  for (const [x, y, z, s] of spots) {
+    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), mats.rock);
+    rock.position.set(x, y, z);
+    rock.scale.set(s * (1 + rng() * 0.5), s * (0.7 + rng() * 0.4), s);
+    rock.rotation.set(rng() * 3, rng() * 3, rng() * 3);
+    rock.userData.baseY = y;
+    rock.userData.phase = rng() * Math.PI * 2;
+    group.add(rock);
+    rocks.push(rock);
+  }
+  return rocks;
 }
 
 function waterMaterial() {
@@ -119,16 +151,17 @@ function waterMaterial() {
       uniform float uTime;
       varying vec2 vXZ;
       void main() {
-        float r = length(vXZ);
-        float ripple = sin(r * 9.0 - uTime * 1.25) * 0.5 + 0.5;
-        float cross = sin(vXZ.x * 4.2 + uTime * 0.7) * cos(vXZ.y * 3.6 - uTime * 0.55);
-        vec3 deep = vec3(0.028, 0.082, 0.072);
-        vec3 shallow = vec3(0.135, 0.285, 0.225);
-        vec3 col = mix(deep, shallow, 0.35 + ripple * 0.22 + cross * 0.08);
-        float sparkle = pow(max(0.0, sin(vXZ.x * 8.0 + vXZ.y * 6.0 + uTime * 1.8)), 42.0);
-        col += vec3(1.0, 0.86, 0.6) * sparkle * 0.35;
-        float edge = smoothstep(1.0, 0.82, r / 2.05);
-        gl_FragColor = vec4(col, 0.94 * edge);
+        float r = length(vXZ) / 2.05;
+        float ripple = sin(r * 17.0 - uTime * 1.15) * 0.5 + 0.5;
+        float ripple2 = sin(r * 29.0 + uTime * 0.7) * 0.5 + 0.5;
+        float drift = sin(vXZ.x * 3.1 + uTime * 0.3) * cos(vXZ.y * 2.7 - uTime * 0.25);
+        vec3 deep = vec3(0.018, 0.062, 0.052);
+        vec3 shallow = vec3(0.072, 0.195, 0.155);
+        vec3 col = mix(deep, shallow, 0.3 + ripple * 0.12 + drift * 0.06 + ripple2 * 0.05);
+        float sparkle = pow(max(0.0, sin(vXZ.x * 3.4 + vXZ.y * 2.2 + uTime * 1.2)), 60.0);
+        col += vec3(0.9, 0.8, 0.6) * sparkle * 0.18;
+        float edge = smoothstep(1.0, 0.8, r);
+        gl_FragColor = vec4(col, 0.92 * edge);
       }
     `,
   });
@@ -210,14 +243,18 @@ function addRocks(group, rng, mats) {
 }
 
 function addRoots(group, rng, mats) {
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2 + rng() * 0.3;
-    const r = ISLAND_R * 0.94;
-    const len = 1.1 + rng() * 2.4;
-    const root = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.05, len, 4), mats.root);
-    root.position.set(Math.cos(a) * r, -0.7 - len / 2, Math.sin(a) * r);
-    root.rotation.z = (rng() - 0.5) * 0.4;
-    root.rotation.x = (rng() - 0.5) * 0.4;
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + rng() * 0.35;
+    const r = ISLAND_R * 0.9;
+    const len = 0.7 + rng() * 1.5;
+    const drift = 0.35 + rng() * 0.55;
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(Math.cos(a) * r, 0.05, Math.sin(a) * r),
+      new THREE.Vector3(Math.cos(a) * (r - 0.15), -len * 0.45, Math.sin(a) * (r - 0.15)),
+      new THREE.Vector3(Math.cos(a + 0.16) * (r - drift * 0.3), -len, Math.sin(a + 0.16) * (r - drift * 0.3)),
+    ]);
+    const root = new THREE.Mesh(new THREE.TubeGeometry(curve, 7, 0.035, 4, false), mats.root);
+    root.castShadow = true;
     group.add(root);
   }
 }
@@ -247,7 +284,7 @@ function addMycelium(group, rng) {
   const mat = new THREE.LineBasicMaterial({
     color: 0x8fe3c0,
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.12,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   });
@@ -282,9 +319,15 @@ export function buildTerrain(scene, rng, mats) {
 
   const base = new THREE.Mesh(
     rockGeometry(rng),
-    new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })
+    new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 1,
+      flatShading: true,
+      emissive: 0x16241c,
+      emissiveIntensity: 0.7,
+    })
   );
-  base.position.y = -4.12;
+  base.position.y = -3.98;
   base.castShadow = false;
   base.receiveShadow = true;
   group.add(base);
@@ -300,6 +343,7 @@ export function buildTerrain(scene, rng, mats) {
   addLog(group, mats);
   addRocks(group, rng, mats);
   addRoots(group, rng, mats);
+  const floatingRocks = addFloatingRocks(group, rng, mats);
   const myceliumMat = addMycelium(group, rng);
 
   scene.add(group);
@@ -308,7 +352,11 @@ export function buildTerrain(scene, rng, mats) {
     group,
     update(t) {
       waterMat.uniforms.uTime.value = t;
-      myceliumMat.opacity = 0.16 + Math.sin(t * 0.7) * 0.05 + 0.05;
+      myceliumMat.opacity = 0.1 + Math.sin(t * 0.7) * 0.035 + 0.035;
+      for (const rock of floatingRocks) {
+        rock.position.y = rock.userData.baseY + Math.sin(t * 0.28 + rock.userData.phase) * 0.28;
+        rock.rotation.y += 0.0008;
+      }
     },
   };
 }
