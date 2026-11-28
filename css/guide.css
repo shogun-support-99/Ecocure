@@ -1,0 +1,1275 @@
+/* ============================================================
+   Ecocure — Phase 2 · The Paper Edition
+   The opening (title page + the live print that opens to full
+   bleed) and chapter 01, built on css/tokens.css and
+   css/plate.css. Everything else on the page is still the old
+   dark layout, so this file is scoped to .opening, .flora and
+   the running head.
+   ============================================================ */
+
+:root {
+  --serif: var(--font-display);
+  --sans: var(--font-text);
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--fig-paper);
+}
+
+/* the old layer set shadows for type over a dark scene; on paper
+   the page itself is the light source */
+.paper h1,
+.paper h2,
+.paper h3,
+.paper p,
+.paper dd,
+.paper dt,
+.paper span {
+  text-shadow: none !important;
+}
+
+.paper {
+  color: var(--fig-ink);
+  font-family: var(--font-text);
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.paper ::selection {
+  background: var(--fig-moss);
+  color: var(--fig-paper);
+}
+
+/* ============================================================
+   Running head — a printed masthead over the paper edition.
+   It turns back into the dark glass once the paper chapters
+   have scrolled away (body.past-paper, set by js/guide.js).
+   ============================================================ */
+
+.site-header {
+  /* opaque: at 95% the big index rows ghosted through the masthead
+     where the paper meets the world */
+  background: var(--fig-paper);
+  border-bottom: var(--hairline) solid var(--fig-rule);
+  color: var(--fig-ink);
+}
+
+.site-header .brand {
+  color: var(--fig-ink);
+}
+
+.site-header .brand__mark {
+  color: var(--fig-moss);
+}
+
+.site-header .brand__word {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+}
+
+.site-header .site-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  color: var(--fig-ink-62);
+}
+
+.site-header .site-nav a:hover {
+  color: var(--fig-ink);
+}
+
+.site-header .site-nav a::after {
+  background: var(--fig-clay);
+}
+
+.site-header .live {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  color: var(--fig-ink-48);
+}
+
+.site-header .live__dot {
+  background: var(--fig-moss);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--fig-moss) 55%, transparent);
+}
+
+.site-header .btn {
+  padding: 0.62rem 0.95rem;
+  background: var(--fig-ink);
+  border-color: var(--fig-ink);
+  color: var(--fig-paper);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+.site-header .btn:hover {
+  background: var(--fig-moss);
+  border-color: var(--fig-moss);
+  color: var(--fig-paper);
+  transform: none;
+}
+
+/* the old dark head, for the chapters still untouched */
+body.past-paper .site-header {
+  background: linear-gradient(180deg, rgba(5, 10, 8, 0.9), rgba(5, 10, 8, 0.72));
+  border-bottom-color: rgba(237, 241, 226, 0.07);
+}
+
+body.past-paper .site-header .brand,
+body.past-paper .site-header .brand__word {
+  color: var(--ink);
+}
+
+body.past-paper .site-header .brand__mark {
+  color: var(--moss);
+}
+
+body.past-paper .site-header .site-nav a {
+  color: var(--muted);
+}
+
+body.past-paper .site-header .site-nav a:hover {
+  color: var(--ink);
+}
+
+body.past-paper .site-header .site-nav a::after {
+  background: var(--moss);
+}
+
+body.past-paper .site-header .live {
+  color: var(--muted-2);
+}
+
+body.past-paper .site-header .live__dot {
+  background: var(--moss);
+}
+
+body.past-paper .site-header .btn {
+  background: var(--moss);
+  border-color: var(--moss);
+  color: #0a130d;
+}
+
+/* The dark vignette belongs to the unopened world below; inside the
+   print the plate's own scrim does that work. */
+body:not(.past-paper) .vignette {
+  opacity: 0;
+}
+
+/* Paper furniture: no dark rail or hotspots until the world is the page. */
+.rail {
+  transition: opacity 0.4s var(--ease);
+}
+
+body:not(.past-paper) .rail {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hotspots {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease);
+}
+
+body.is-plate-open .hotspots,
+body.past-paper .hotspots {
+  opacity: 1;
+}
+
+/* ============================================================
+   00 — The opening
+   A title page on paper with the print tipped in at the foot.
+   One [data-plate] stage: --plate-open runs 0 → 1 on scroll,
+   the print grows to the full viewport and the type gives way.
+   ============================================================ */
+
+.opening {
+  --live-h: clamp(160px, 22svh, 220px);
+
+  position: relative;
+  height: calc(100dvh + 84dvh);
+  z-index: 4;
+}
+
+.opening::before {
+  display: none;
+}
+
+.opening__stage {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: clip;
+}
+
+/* ---------- the title page ---------- */
+
+.opening__sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--header-h) + clamp(1rem, 2.4vh, 1.75rem)) var(--pad-page)
+    calc(var(--live-h) + 3.25rem + var(--pad-page));
+  pointer-events: none;
+  opacity: clamp(0, calc(1 - var(--plate-open) * 1.5), 1);
+  translate: 0 calc(var(--plate-open) * -26px);
+}
+
+.opening__sheet a {
+  pointer-events: auto;
+}
+
+.opening[data-open="1.00"] .opening__sheet {
+  visibility: hidden;
+}
+
+.opening__masthead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: 0.8rem;
+  border-bottom: var(--hairline) solid var(--fig-rule);
+  color: var(--fig-ink-48);
+}
+
+.opening__masthead p:nth-child(2) {
+  color: var(--fig-ink-62);
+}
+
+.opening__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: end;
+  column-gap: clamp(2rem, 5vw, 4rem);
+  margin-top: auto;
+}
+
+.opening__text {
+  max-width: 62rem;
+}
+
+.opening__body .t-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: clamp(1rem, 2.4vh, 1.6rem);
+}
+
+.opening__body .eyebrow__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fig-moss);
+  box-shadow: none;
+}
+
+.opening__body .t-hero {
+  font-weight: 300;
+}
+
+.opening__body .t-lede {
+  margin-top: clamp(1.1rem, 2.6vh, 1.75rem);
+}
+
+.opening__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem clamp(1.5rem, 3vw, 3rem);
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  padding-top: 1rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+}
+
+.opening__actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  flex-wrap: wrap;
+}
+
+.paper .btn {
+  padding: 0.85rem 1.35rem;
+  background: var(--fig-ink);
+  border: 1px solid var(--fig-ink);
+  border-radius: 999px;
+  color: var(--fig-paper);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+.paper .btn:hover {
+  background: var(--fig-moss);
+  border-color: var(--fig-moss);
+  color: var(--fig-paper);
+}
+
+.paper .link {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--fig-ink-62);
+  border-bottom-color: var(--fig-rule-strong);
+}
+
+.paper .link:hover {
+  color: var(--fig-ink);
+  border-bottom-color: var(--fig-clay);
+}
+
+.opening__meta {
+  display: flex;
+  gap: clamp(1.25rem, 3vw, 2.75rem);
+  margin: 0 0 0.35rem;
+}
+
+.opening__meta dt {
+  margin-bottom: 0.3rem;
+  color: var(--fig-ink-48);
+}
+
+.opening__meta dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- the live print ---------- */
+
+.opening__pin {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  align-items: flex-end;
+  padding-bottom: calc(var(--pad-page) * (1 - var(--plate-open)));
+}
+
+/* The frame is a window, not an image: its interior is left
+   transparent so the fixed WebGL scene shows through, clipped
+   to this rectangle by js/guide.js. The mat is drawn as an
+   inset shadow so it can collapse to nothing at full bleed. */
+.plate--live {
+  --plate-mat: 14px;
+}
+
+.plate--live .plate__frame {
+  aspect-ratio: auto;
+  max-height: none;
+  height: calc(var(--live-h) + (100dvh - var(--live-h)) * var(--plate-open));
+  background: transparent;
+  border-color: var(--fig-rule-strong);
+  box-shadow: inset 0 0 0 calc(var(--plate-mat) * (1 - var(--plate-open)))
+    var(--fig-paper-raised);
+}
+
+.plate--live .plate__img,
+.plate--live .hotspots {
+  display: none;
+}
+
+.plate--live .plate__overlay {
+  pointer-events: none;
+  padding-bottom: 0;
+}
+
+.plate--live .plate__caption {
+  color: var(--fig-ink-48);
+}
+
+/* Without WebGL there is no world to look through: the print becomes
+   a still of the island rather than an empty dark window, and the
+   invitation to drag the scene goes with it. */
+.no-webgl .plate--live .plate__frame {
+  background: var(--fig-night) url("../images/plate-world.jpg") center / cover
+    no-repeat;
+}
+
+.no-webgl .plate__line {
+  display: none;
+}
+
+/* ============================================================
+   01 — Flora, as the first printed chapter
+   ============================================================ */
+
+.flora {
+  position: relative;
+  z-index: 4;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--header-h) + clamp(3rem, 7vw, 6rem)) var(--pad-page)
+    clamp(4rem, 9vw, 7rem);
+  background: var(--fig-paper);
+  color: var(--fig-ink);
+}
+
+.flora__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.flora__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 clamp(1.25rem, 2.4vw, 1.75rem);
+}
+
+.flora__mark-rule {
+  width: 2.5rem;
+  height: var(--hairline);
+  background: var(--fig-rule-strong);
+}
+
+.flora__copy .t-body {
+  margin-top: clamp(1.1rem, 2vw, 1.6rem);
+}
+
+.flora__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 1.75rem;
+  margin-top: clamp(1.6rem, 3vw, 2.25rem);
+  padding-top: 1.1rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+}
+
+.flora__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.flora__stat .t-figure {
+  font-size: clamp(1.75rem, 2.6vw, 2.35rem);
+  font-weight: 300;
+}
+
+.flora__stat .t-figure small {
+  margin-left: 0.1em;
+  font-family: var(--font-text);
+  font-size: 0.42em;
+  letter-spacing: 0;
+}
+
+.flora__stat-label {
+  max-width: 22ch;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: var(--fig-ink-48);
+}
+
+.flora__note {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  padding: 1rem 1.15rem 0.9rem;
+  text-align: left;
+  background: var(--fig-paper-raised);
+  border: var(--hairline) solid var(--fig-rule-strong);
+  border-radius: var(--radius);
+  color: var(--fig-ink);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out);
+}
+
+.flora__note:hover {
+  border-color: var(--fig-ink);
+  translate: 0 -2px;
+}
+
+.flora__note-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.flora__note-tag,
+.flora__note-pl,
+.flora__note-meta,
+.flora__note-cta {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.flora__note-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--fig-moss);
+}
+
+.flora__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--fig-moss);
+}
+
+.flora__note-pl {
+  color: var(--fig-ink-32);
+}
+
+.flora__note-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.9vw, 1.6rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: var(--track-title);
+}
+
+.flora__note-latin {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--fig-ink-62);
+}
+
+.flora__note-meta {
+  margin-top: 0.45rem;
+  color: var(--fig-ink-48);
+  letter-spacing: 0.08em;
+}
+
+.flora__note-cta {
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+  color: var(--fig-ink-62);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.flora__note:hover .flora__note-cta {
+  color: var(--fig-clay);
+}
+
+.flora__plate {
+  margin: 0;
+}
+
+.flora__plate-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-meta);
+  text-transform: uppercase;
+  color: var(--fig-ink-48);
+}
+
+.flora__plate .plate__frame {
+  box-shadow: 0 22px 48px -34px rgba(26, 28, 19, 0.55);
+}
+
+.flora__plate .plate__caption {
+  color: var(--fig-ink-48);
+}
+
+/* ============================================================
+   Small screens
+   ============================================================ */
+
+@media (max-width: 980px) {
+  .flora {
+    align-items: flex-start;
+    padding-top: calc(var(--header-h) + 2.25rem);
+  }
+
+  .flora__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2.25rem, 6vw, 3rem);
+  }
+
+  .flora__copy .t-body {
+    max-width: 46ch;
+  }
+}
+
+@media (max-width: 760px) {
+  .opening__sheet {
+    padding-top: calc(var(--header-h) + 0.9rem);
+    padding-bottom: calc(var(--live-h) + 4.2rem + var(--pad-page));
+  }
+
+  .opening__masthead {
+    display: none;
+  }
+
+  .opening__body {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1.1rem;
+  }
+
+  .opening__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0;
+  }
+
+  /* values on the top line, labels beneath — a printed stat row */
+  .opening__meta > div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 0.3rem;
+    height: 100%;
+  }
+
+  .opening__meta dd {
+    margin: 0;
+    min-height: 2.45em;
+    font-size: 0.9375rem;
+  }
+
+  .opening__meta dt {
+    margin: 0;
+    letter-spacing: 0.1em;
+  }
+
+  .opening__foot {
+    gap: 1rem;
+  }
+
+  .opening__meta {
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .opening__meta dd {
+    font-size: 0.9375rem;
+  }
+
+  .opening {
+    --live-h: clamp(150px, 20svh, 200px);
+  }
+
+  .opening__body .t-hero {
+    font-size: clamp(2.6rem, 11.2vw, 3.4rem);
+  }
+
+  .opening__body .t-lede {
+    max-width: 34ch;
+  }
+
+  .flora__stats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Short laptop viewports: the title page and the tipped-in print
+   have to share one screen, so the title steps down and the
+   masthead row is dropped rather than crowding the print. */
+@media (max-height: 820px) and (min-width: 761px) {
+  .opening {
+    --live-h: clamp(140px, 20svh, 190px);
+  }
+
+  .opening__sheet {
+    padding-top: calc(var(--header-h) + 0.75rem);
+  }
+
+  .opening__masthead {
+    display: none;
+  }
+
+  .opening__body .t-hero {
+    font-size: clamp(2.6rem, 5.4vw, 5.2rem);
+  }
+}
+
+/* ============================================================
+   02–03 — Fauna and Understory
+   The paper edition continues: same sheet, same type, the plate
+   alternating sides. Fauna carries a photograph and a register
+   of two residents; Understory carries a drawn cross-section,
+   so the atlas has both a camera and a pencil.
+   ============================================================ */
+
+.fauna,
+.understory {
+  position: relative;
+  z-index: 4;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--header-h) + clamp(3rem, 7vw, 6rem)) var(--pad-page)
+    clamp(4rem, 9vw, 7rem);
+  background: var(--fig-paper);
+  color: var(--fig-ink);
+}
+
+.fauna__grid,
+.understory__grid {
+  display: grid;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* Fauna is the mirror of Flora: the plate holds the left page. */
+.fauna__grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+}
+
+.fauna__copy {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.fauna__plate {
+  grid-column: 1;
+  grid-row: 1;
+  order: 0;
+}
+
+.understory__grid {
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+}
+
+/* ---------- the printed chapter mark ---------- */
+
+.paper-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 clamp(1.25rem, 2.4vw, 1.75rem);
+}
+
+.paper-mark__rule {
+  width: 2.5rem;
+  height: var(--hairline);
+  background: var(--fig-rule-strong);
+}
+
+.fauna__copy .t-body,
+.understory__copy .t-body {
+  margin-top: clamp(1.1rem, 2vw, 1.6rem);
+}
+
+/* ---------- printed figures ---------- */
+
+.paper-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 1.75rem;
+  margin-top: clamp(1.6rem, 3vw, 2.25rem);
+  padding-top: 1.1rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+}
+
+.paper-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.paper-stat .t-figure {
+  font-size: clamp(1.75rem, 2.6vw, 2.35rem);
+  font-weight: 300;
+}
+
+.paper-stat .t-figure small {
+  margin-left: 0.1em;
+  font-family: var(--font-text);
+  font-size: 0.42em;
+  letter-spacing: 0;
+}
+
+.paper-stat__label {
+  max-width: 22ch;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: var(--fig-ink-48);
+}
+
+/* ---------- the field-note card ---------- */
+
+.fieldnote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 1rem 1.15rem 0.9rem;
+  text-align: left;
+  background: var(--fig-paper-raised);
+  border: var(--hairline) solid var(--fig-rule-strong);
+  border-radius: var(--radius);
+  color: var(--fig-ink);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out);
+}
+
+.fieldnote:hover {
+  border-color: var(--fig-ink);
+  translate: 0 -2px;
+}
+
+.fieldnote__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.fieldnote__tag,
+.fieldnote__pl,
+.fieldnote__meta,
+.fieldnote__cta {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fieldnote__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--fig-moss);
+}
+
+.fieldnote__tag--clay {
+  color: var(--fig-clay);
+}
+
+.fieldnote__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.fieldnote__pl {
+  color: var(--fig-ink-32);
+}
+
+.fieldnote__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 1.8vw, 1.5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: var(--track-title);
+}
+
+.fieldnote__latin {
+  font-family: var(--font-text);
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--fig-ink-62);
+}
+
+.fieldnote__meta {
+  margin-top: 0.45rem;
+  color: var(--fig-ink-48);
+  letter-spacing: 0.08em;
+}
+
+.fieldnote__cta {
+  margin-top: 0.85rem;
+  padding-top: 0.6rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+  color: var(--fig-ink-62);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.fieldnote:hover .fieldnote__cta {
+  color: var(--fig-clay);
+}
+
+.fauna__notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+/* Between the stacked layout and a roomy two-column page the copy
+   column is too narrow for two cards: their tag rows break mid-phrase. */
+@media (min-width: 981px) and (max-width: 1160px) {
+  .fauna__notes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.fauna__notes .fieldnote__cta {
+  margin-top: auto;
+}
+
+.fieldnote--wide {
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+/* ---------- the plates ---------- */
+
+.plate-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-meta);
+  text-transform: uppercase;
+  color: var(--fig-ink-48);
+}
+
+.fauna__plate,
+.understory__plate {
+  margin: 0;
+}
+
+.fauna__plate .plate__frame,
+.understory__plate .plate__frame {
+  box-shadow: 0 22px 48px -34px rgba(26, 28, 19, 0.55);
+}
+
+.fauna__plate .plate__caption,
+.understory__plate .plate__caption {
+  color: var(--fig-ink-48);
+}
+
+/* The drawing is ink on ink: it keeps its own colour instead of
+   going through the sepia mat treatment of the camera plate. */
+.plate--diagram .plate__img {
+  filter: none;
+  object-position: 50% 50%;
+  background: var(--fig-night);
+}
+
+.plate--diagram .plate__frame {
+  background: var(--fig-paper-raised);
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 980px) {
+  .fauna,
+  .understory {
+    align-items: flex-start;
+    padding-top: calc(var(--header-h) + 2.25rem);
+  }
+
+  .fauna__grid,
+  .understory__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2.25rem, 6vw, 3rem);
+  }
+
+  .fauna__copy,
+  .fauna__plate {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .fauna__copy .t-body,
+  .understory__copy .t-body {
+    max-width: 46ch;
+  }
+}
+
+@media (max-width: 760px) {
+  .paper-stats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .fauna__notes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* the drawn plate's caption is the longest in the atlas: let the
+     two halves keep their own line instead of breaking mid-phrase */
+  .fauna__plate .plate__caption,
+  .understory__plate .plate__caption {
+    flex-wrap: wrap;
+    gap: 0.15rem 1rem;
+  }
+
+  .fauna__plate .plate__caption span,
+  .understory__plate .plate__caption span {
+    white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   04–05 — Care and the field index
+   The last two leaves of the atlas. Care is the record page:
+   one centred column, the count set as a printed table. The
+   index is the back matter: a ruled list where every line is
+   still a live field note. After it the paper runs out and the
+   island closes the book.
+   ============================================================ */
+
+.care,
+.index {
+  position: relative;
+  z-index: 4;
+  background: var(--fig-paper);
+  color: var(--fig-ink);
+}
+
+.care {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--header-h) + clamp(3rem, 7vw, 6rem)) var(--pad-page)
+    clamp(4rem, 9vw, 7rem);
+}
+
+.care__sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 62rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.paper-mark--center {
+  justify-content: center;
+}
+
+.care__sheet .t-h2 {
+  margin-top: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.care__body {
+  max-width: 54ch;
+  margin-top: clamp(1.25rem, 2.4vw, 1.9rem);
+}
+
+.care__sheet .paper-stats {
+  width: 100%;
+  margin-top: clamp(2.25rem, 4.5vw, 3.25rem);
+  text-align: center;
+}
+
+.care__sheet .paper-stat {
+  align-items: center;
+}
+
+.care__sheet .paper-stat__label {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.care__imprint {
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+  padding-top: 0.9rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+  color: var(--fig-ink-32);
+}
+
+@media (min-width: 761px) {
+  .paper-stats--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .paper-stats--three .paper-stat + .paper-stat {
+    padding-left: clamp(1.25rem, 2.5vw, 2rem);
+    border-left: var(--hairline) solid var(--fig-rule);
+  }
+}
+
+/* ---------- the back matter ---------- */
+
+.index {
+  display: flex;
+  align-items: center;
+  min-height: 100dvh;
+  padding: calc(var(--header-h) + clamp(3rem, 6vw, 5rem)) var(--pad-page)
+    clamp(3rem, 6vw, 5rem);
+}
+
+.index__inner {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.index .index-head {
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.index .index-head__note {
+  max-width: 34ch;
+  margin: 0 0 0.35rem;
+  font-size: var(--type-small);
+  line-height: var(--leading-body);
+  color: var(--fig-ink-62);
+}
+
+.index .index-list {
+  border-bottom: var(--hairline) solid var(--fig-rule-strong);
+}
+
+.index .index-row {
+  padding: 1.15rem 0.4rem;
+  border-top: var(--hairline) solid var(--fig-rule);
+}
+
+.index .index-row:hover {
+  background: color-mix(in srgb, var(--fig-moss) 8%, transparent);
+  padding-left: 0.9rem;
+}
+
+.index .index-row__no {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-meta);
+  color: var(--fig-ink-32);
+}
+
+.index .index-row__name {
+  font-weight: 300;
+  color: var(--fig-ink);
+}
+
+.index .index-row__latin {
+  color: var(--fig-ink-48);
+}
+
+.index .index-row__group,
+.index .index-row__status {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 0.12em;
+}
+
+.index .index-row__group {
+  color: var(--fig-ink-32);
+}
+
+.index .index-row__status {
+  color: var(--fig-clay);
+}
+
+.index .index-row__arrow {
+  color: var(--fig-ink-32);
+}
+
+.index .index-row:hover .index-row__arrow {
+  color: var(--fig-clay);
+}
+
+/* ---------- the closing leaf: paper ends, the world returns ---------- */
+
+.closing {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100dvh;
+  padding: calc(var(--header-h) + 8vh) var(--pad) 0;
+}
+
+.closing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 10, 8, 0.28) 0%,
+    rgba(5, 10, 8, 0.78) 34%,
+    rgba(5, 10, 8, 0.95) 100%
+  );
+}
+
+.closing__inner {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* With no world behind it the closing leaf still has to be a dark
+   leaf, not the paper showing through the scrim. */
+.no-webgl .closing {
+  background: var(--fig-night);
+}
+
+/* keep the closing page clear of the chapter rail, as the dark
+   chapters did before the paper edition */
+@media (min-width: 960px) {
+  .closing__inner,
+  .closing .site-footer {
+    padding-right: 5.5rem;
+  }
+}
+
+@media (max-width: 980px) {
+  .closing {
+    padding-inline: var(--pad-page);
+  }
+}
+
+@media (max-width: 760px) {
+  .care,
+  .index {
+    padding-top: calc(var(--header-h) + 2.25rem);
+  }
+
+  .index .index-head {
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .index .index-row {
+    padding: 1rem 0.3rem;
+  }
+
+  .index .index-row:hover {
+    padding-left: 0.55rem;
+  }
+}

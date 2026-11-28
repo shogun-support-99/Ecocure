@@ -1,0 +1,201 @@
+/* ============================================================
+   The plate — a print in the paper that can open to full bleed.
+   One input: --plate-open (0 → 1). Everything (margin, mat,
+   border, aspect ratio, filter, caption, overlay) interpolates
+   from it, so the same component is a hero figure, a static
+   plate and a pinned scroll moment.
+
+   Markup:
+     <figure class="plate">
+       <div class="plate__frame">
+         <img class="plate__img" ...>
+         <span class="plate__tag">Pl. I</span>
+         <div class="plate__scrim"></div>
+         <div class="plate__overlay" aria-hidden="true">…</div>
+       </div>
+       <figcaption class="plate__caption">…</figcaption>
+     </figure>
+   ============================================================ */
+
+.plate {
+  --o: clamp(0, var(--plate-open), 1);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  margin-inline: auto;
+}
+
+/* ---------- the print ---------- */
+
+.plate__frame {
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+  width: 100%;
+  padding: calc(var(--plate-mat) * (1 - var(--o)));
+  background: var(--fig-paper-raised);
+  border: calc(var(--hairline) * (1 - var(--o))) solid var(--fig-rule-strong);
+  border-radius: var(--radius);
+  aspect-ratio: calc(
+    var(--plate-ratio-closed) * (1 - var(--o)) + var(--plate-ratio-open) * var(--o)
+  );
+  max-height: 86svh;
+}
+
+.plate__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 46% 52%;
+  /* Sepia mat print → full-colour window. */
+  filter: saturate(calc(0.62 + 0.38 * var(--o)))
+    sepia(calc(0.16 * (1 - var(--o))))
+    contrast(calc(1.03 + 0.01 * var(--o)))
+    brightness(calc(1.06 - 0.06 * var(--o)));
+}
+
+/* ---------- plate number, aligned to the print edge ---------- */
+
+.plate__tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 3px 7px;
+  background: var(--fig-paper);
+  border: var(--hairline) solid var(--fig-rule);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  line-height: 1.2;
+  letter-spacing: var(--track-meta);
+  text-transform: uppercase;
+  color: var(--fig-ink-62);
+  opacity: clamp(0, calc(1.5 - 2.1 * var(--o)), 1);
+  translate: 0 -52%;
+}
+
+/* ---------- full-bleed furniture ---------- */
+
+.plate__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--o);
+  /* Strong enough to hold paper-white type over a sunrise sky,
+     gone by the horizon line. */
+  background: linear-gradient(
+    0deg,
+    var(--fig-plate-scrim) 0%,
+    color-mix(in srgb, var(--fig-night) 62%, transparent) 30%,
+    color-mix(in srgb, var(--fig-night) 28%, transparent) 52%,
+    transparent 74%
+  );
+}
+
+.plate__overlay {
+  position: absolute;
+  z-index: 2;
+  left: clamp(var(--space-4), 3vw, var(--space-7));
+  right: clamp(var(--space-4), 3vw, var(--space-7));
+  bottom: clamp(var(--space-4), 3vw, var(--space-7));
+  display: grid;
+  gap: 0.35rem;
+  color: var(--fig-on-plate);
+  opacity: clamp(0, calc((var(--o) - 0.55) * 2.4), 1);
+  translate: 0 calc((1 - var(--o)) * 14px);
+}
+
+.plate__kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--fig-on-plate) 82%, transparent);
+}
+
+.plate__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.4vw, 2.1rem);
+  line-height: 1.02;
+  letter-spacing: var(--track-display);
+  text-shadow: 0 1px 18px rgba(13, 16, 9, 0.45);
+}
+
+.plate__title i {
+  font-style: italic;
+  color: color-mix(in srgb, var(--fig-on-plate) 74%, transparent);
+}
+
+.plate__line {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: var(--type-small);
+  color: color-mix(in srgb, var(--fig-on-plate) 76%, transparent);
+}
+
+/* ---------- printed caption ---------- */
+
+.plate__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  overflow: clip;
+  max-height: calc(4rem * (1 - var(--o)));
+  margin-top: calc(9px * (1 - var(--o)));
+  padding-top: calc(7px * (1 - var(--o)));
+  border-top: var(--hairline) solid
+    color-mix(in srgb, var(--fig-rule) calc(100% * (1 - var(--o))), transparent);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-meta);
+  text-transform: uppercase;
+  color: var(--fig-ink-62);
+  opacity: clamp(0, calc(1 - 1.9 * var(--o)), 1);
+}
+
+/* ============================================================
+   Pinned scroll variant: the plate opens as the stage passes
+   through one viewport. Progress is written to --plate-open on
+   the stage by js/plate.js, so the print is inset at first and
+   edge-to-edge when open.
+   ============================================================ */
+
+.plate-scroll {
+  position: relative;
+  height: calc(100svh + var(--plate-run));
+}
+
+.plate-pin {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100svh;
+  padding-inline: calc(var(--plate-bleed) * (1 - var(--o, var(--plate-open))));
+}
+
+.plate-pin .plate {
+  max-width: calc(
+    var(--plate-closed-max) + (100% - var(--plate-closed-max)) * var(--o)
+  );
+}
+
+/* On a narrow screen an opened 16:9 print is a letterbox line:
+   the open ratio turns portrait so the plate fills the eye and
+   reads as the page rather than a band. */
+@media (max-width: 760px) {
+  .plate {
+    --plate-ratio-open: 0.56;
+  }
+
+  .plate__frame {
+    max-height: 78svh;
+  }
+}

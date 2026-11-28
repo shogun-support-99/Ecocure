@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ecocure — Phase 1 · Foundations</title>
+<meta name="description" content="Design tokens, type specimens at real sizes and the plate system for Ecocure's Field Guide rebuild." />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#09090a" />
+<link rel="preload" href="../fonts/fraunces-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="../fonts/instrument-sans-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="../css/tokens.css" />
+<link rel="stylesheet" href="../css/plate.css" />
+<link rel="stylesheet" href="./phase1.css" />
+</head>
+<body>
+
+<header class="rb">
+  <div class="rb__id">
+    <span class="rb__mark">Ecocure</span>
+    <span class="rb__sep">/</span>
+    <span>Phase 1 · Foundations</span>
+  </div>
+  <nav class="rb__nav" aria-label="Sections">
+    <a href="./index.html">Style frames</a>
+    <a href="#palette">Palette</a>
+    <a href="#type">Type</a>
+    <a href="#plate">Plate</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="intro wrap">
+    <p class="intro__kicker">Frame A · The Paper Edition <span>+ the plate that opens</span></p>
+    <h1 class="intro__title">Foundations<br />before the rewrite.</h1>
+    <p class="intro__lede">
+      The live site is untouched. This page is the layer every rewritten section will be built
+      from: one token file, one self-hosted type trio, one plate component. Judge the palette,
+      the real reading sizes and the opening here — then the sections get rewritten against them.
+    </p>
+    <dl class="intro__facts">
+      <div><dt>Tokens</dt><dd>css/tokens.css — colour, type, space, motion, plate</dd></div>
+      <div><dt>Type</dt><dd>Fraunces · Instrument Sans · Martian Mono</dd></div>
+      <div><dt>Fonts</dt><dd>5 woff2 · 220 KB · latin, self-hosted</dd></div>
+      <div><dt>Plate</dt><dd>css/plate.css — matted print → full bleed</dd></div>
+    </dl>
+  </section>
+
+  <!-- ══════════ PALETTE ══════════ -->
+  <section class="wrap" id="palette">
+    <div class="sheet fig">
+      <div class="sheet__head">
+        <p class="t-label t-label--moss">01 — Colour</p>
+        <h2 class="t-h2">Paper, ink,<br /><em>moss, clay.</em></h2>
+      </div>
+
+      <p class="t-body measure-wide sheet__note">
+        Four printed values, nothing else. Tints are mixed from the ink token, so a rule or a
+        caption can never drift away from the palette. Moss carries labels and chapter numbers;
+        clay is reserved for italic emphasis and nothing functional.
+      </p>
+
+      <ul class="swatches">
+        <li class="swatch" style="--c: #f4efe2">
+          <i aria-hidden="true"></i>
+          <b>#F4EFE2</b>
+          <span>paper — page ground</span>
+        </li>
+        <li class="swatch" style="--c: #1a1c13">
+          <i aria-hidden="true"></i>
+          <b>#1A1C13</b>
+          <span>ink — type, rules, buttons</span>
+        </li>
+        <li class="swatch" style="--c: #4d6330">
+          <i aria-hidden="true"></i>
+          <b>#4D6330</b>
+          <span>moss — labels, index</span>
+        </li>
+        <li class="swatch" style="--c: #9a4f2b">
+          <i aria-hidden="true"></i>
+          <b>#9A4F2B</b>
+          <span>clay — italic emphasis</span>
+        </li>
+      </ul>
+
+      <dl class="contrast">
+        <div>
+          <dt>Ink on paper</dt>
+          <dd><b>15.0:1</b><span>Display and body · AAA</span></dd>
+        </div>
+        <div>
+          <dt>Moss on paper</dt>
+          <dd><b>5.8:1</b><span>Labels, chapter numbers · AA</span></dd>
+        </div>
+        <div>
+          <dt>Clay on paper</dt>
+          <dd><b>5.2:1</b><span>Italic emphasis · AA</span></dd>
+        </div>
+        <div>
+          <dt>Paper on night</dt>
+          <dd><b>16.7:1</b><span>Plate overlay · AAA</span></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ══════════ TYPE ══════════ -->
+  <section class="wrap" id="type">
+    <div class="sheet fig">
+      <div class="sheet__head">
+        <p class="t-label t-label--moss">02 — Type</p>
+        <h2 class="t-h2">Set at the sizes<br /><em>it will be read.</em></h2>
+      </div>
+
+      <p class="t-body measure-wide sheet__note">
+        Real copy, real tokens, measured live in this browser — not a scaled screenshot. Resize
+        the window and the readouts follow. Fraunces carries display; Instrument Sans sets the
+        reading text; Martian Mono is the station's voice for labels, figures and coordinates.
+      </p>
+
+      <div class="specs">
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-hero · --type-hero · Fraunces 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-hero" data-specimen>A living atlas<br /><em>of the wild.</em></p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-h2 · --type-h2 · Fraunces 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-h2" data-specimen>The quiet<br /><em>architects.</em></p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-h3 · --type-h3 · Fraunces 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-h3" data-specimen>Rewilding, measured.</p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-figure · --type-figure · Fraunces 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-figure" data-specimen>12,400 <small>ha</small></p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-lede · --type-lede · Instrument Sans 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-lede" data-specimen>
+            Ecocure maps the small ecologies that hold a landscape together — the oak and the owl,
+            the fungus and the fox — and gives them room to return.
+          </p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-body · --type-body · Instrument Sans 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-body" data-specimen>
+            Plants make the air, the shade and the soil. A single mature oak can host more than two
+            thousand species — an entire ecosystem wearing bark. We survey them crown to root, then
+            let the woodland close around them.
+          </p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-title · --type-title · Instrument Sans 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-title" data-specimen>English oak <span class="spec__latin">Quercus robur</span></p>
+        </div>
+
+        <div class="spec">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-small · --type-small · Instrument Sans 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-small" data-specimen>Oldest resident · 340 years · keystone, protected.</p>
+        </div>
+
+        <div class="spec spec--mono">
+          <div class="spec__head">
+            <p class="t-micro spec__token">t-label · --type-label · Martian Mono 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-label t-label--moss" data-specimen>01 — Flora</p>
+          <div class="spec__head spec__head--tight">
+            <p class="t-micro spec__token">t-meta · --type-meta · Martian Mono 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-meta" data-specimen>47.3769° N · 8.5417° E</p>
+          <div class="spec__head spec__head--tight">
+            <p class="t-micro spec__token">t-micro · --type-micro · Martian Mono 400</p>
+            <p class="t-micro spec__read" data-read></p>
+          </div>
+          <p class="t-micro" data-specimen>North ridge, first light · 04:51</p>
+        </div>
+
+      </div>
+
+      <div class="tokens">
+        <div class="tokens__head">
+          <p class="t-label t-label--moss">Scale, as declared</p>
+          <p class="t-micro">Fluid values resolve at 390 and 1440 in the readouts above.</p>
+        </div>
+        <dl class="tokens__list">
+          <div><dt>--type-hero</dt><dd>clamp(2.9rem, 6.9vw, 6.9rem)</dd></div>
+          <div><dt>--type-h2</dt><dd>clamp(2.05rem, 3.4vw, 3.05rem)</dd></div>
+          <div><dt>--type-h3</dt><dd>clamp(1.45rem, 1.9vw, 1.85rem)</dd></div>
+          <div><dt>--type-figure</dt><dd>clamp(1.5rem, 2.1vw, 2rem)</dd></div>
+          <div><dt>--type-lede</dt><dd>clamp(1.0625rem, 1.15vw, 1.1875rem)</dd></div>
+          <div><dt>--type-body</dt><dd>1rem</dd></div>
+          <div><dt>--measure-lede</dt><dd>33ch</dd></div>
+          <div><dt>--measure-body</dt><dd>36ch</dd></div>
+          <div><dt>--pad-page</dt><dd>clamp(1.25rem, 4.2vw, 3.625rem)</dd></div>
+          <div><dt>--track-hero</dt><dd>-0.038em</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PLATE: STATES ══════════ -->
+  <section class="wrap" id="plate">
+    <div class="sheet fig">
+      <div class="sheet__head">
+        <p class="t-label t-label--moss">03 — Plate, as component</p>
+        <h2 class="t-h2">A print, a mat,<br /><em>an opening.</em></h2>
+      </div>
+
+      <p class="t-body measure-wide sheet__note">
+        The same three elements in three states. Only <code>--plate-open</code> changes: mat and
+        border collapse, the ratio turns from 4:3 print to a wide window, the sepia lifts to full
+        colour, the printed caption gives way to a label on the image.
+      </p>
+
+      <div class="states">
+        <figure class="state">
+          <div class="plate" style="--plate-open: 0; --plate-bleed: 0">
+            <div class="plate__frame">
+              <img class="plate__img" src="./plate.jpg" alt="A lone oak on a misty ridge at first light" width="1392" height="752" />
+              <span class="plate__tag">Pl. I</span>
+              <div class="plate__scrim" aria-hidden="true"></div>
+              <div class="plate__overlay" aria-hidden="true">
+                <p class="plate__kicker">Plate I · North ridge</p>
+                <p class="plate__title">English oak <i>Quercus robur</i></p>
+              </div>
+            </div>
+            <figcaption class="plate__caption"><span>North ridge, first light</span><span>04:51</span></figcaption>
+          </div>
+          <figcaption class="state__label">0 · matted print<span>4:3 · sepia · caption below</span></figcaption>
+        </figure>
+
+        <figure class="state">
+          <div class="plate" style="--plate-open: 0.5; --plate-bleed: 0">
+            <div class="plate__frame">
+              <img class="plate__img" src="./plate.jpg" alt="" width="1392" height="752" />
+              <span class="plate__tag">Pl. I</span>
+              <div class="plate__scrim" aria-hidden="true"></div>
+              <div class="plate__overlay" aria-hidden="true">
+                <p class="plate__kicker">Plate I · North ridge</p>
+                <p class="plate__title">English oak <i>Quercus robur</i></p>
+              </div>
+            </div>
+            <figcaption class="plate__caption"><span>North ridge, first light</span><span>04:51</span></figcaption>
+          </div>
+          <figcaption class="state__label">0.5 · opening<span>mat half gone · colour returning</span></figcaption>
+        </figure>
+
+        <figure class="state">
+          <div class="plate" style="--plate-open: 1; --plate-bleed: 0">
+            <div class="plate__frame">
+              <img class="plate__img" src="./plate.jpg" alt="" width="1392" height="752" />
+              <span class="plate__tag">Pl. I</span>
+              <div class="plate__scrim" aria-hidden="true"></div>
+              <div class="plate__overlay" aria-hidden="true">
+                <p class="plate__kicker">Plate I · North ridge · 04:51</p>
+                <p class="plate__title">English oak <i>Quercus robur</i></p>
+                <p class="plate__line">340 years · ≈2,300 species in its crown</p>
+              </div>
+            </div>
+            <figcaption class="plate__caption"><span>North ridge, first light</span><span>04:51</span></figcaption>
+          </div>
+          <figcaption class="state__label">1 · open<span>edge to edge · full colour · label on plate</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════ PLATE: THE SCROLL MOMENT ══════════ -->
+<section class="plate-section" id="plate-scroll">
+  <div class="wrap plate-section__head">
+    <p class="t-label t-label--moss">04 — The opening, on scroll</p>
+    <h2 class="t-h2">The plate<br /><em>becomes the page.</em></h2>
+    <p class="t-body measure-wide sheet__note">
+      The component pinned for one viewport. Scroll through and the print opens edge to edge on
+      its own — no video, no canvas, one custom property written from scroll position. This is the
+      transition the hero and each chapter will use.
+    </p>
+    <p class="plate-readout">
+      plate open <b data-plate-readout>0.00</b>
+      <span aria-hidden="true">·</span>
+      <span data-plate-state>matted print</span>
+    </p>
+  </div>
+
+  <div class="plate-scroll" data-plate>
+    <div class="plate-pin">
+      <figure class="plate">
+        <div class="plate__frame">
+          <img class="plate__img" src="./plate.jpg" alt="A lone oak on a misty ridge at first light, the station's oldest resident" width="1392" height="752" />
+          <span class="plate__tag">Pl. I</span>
+          <div class="plate__scrim" aria-hidden="true"></div>
+          <div class="plate__overlay" aria-hidden="true">
+            <p class="plate__kicker">Plate I · North ridge · 04:51</p>
+            <p class="plate__title">English oak <i>Quercus robur</i></p>
+            <p class="plate__line">340 years · ≈2,300 species in its crown</p>
+          </div>
+        </div>
+        <figcaption class="plate__caption">
+          <span>North ridge, first light</span>
+          <span>04:51</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<main class="wrap closing">
+  <p class="t-label t-label--moss closing__kicker">Held back on purpose</p>
+  <h2 class="closing__title">No section has been<br />rewritten yet.</h2>
+  <ul class="closing__list">
+    <li><b>index.html, css/style.css and the 3D world are untouched.</b> This page and the two new files are additive.</li>
+    <li><b>No Google Fonts in production.</b> Fraunces, Instrument Sans and Martian Mono are served from /fonts as 5 woff2 files.</li>
+    <li><b>The plate is code, not a composite.</b> States are driven by one property; the scroll opening is js/plate.js reading position.</li>
+    <li><b>Not here yet:</b> the chapter layouts, the index table, the field-note panel, motion beyond the plate, and any 3D-to-plate handoff.</li>
+  </ul>
+  <p class="closing__next">
+    Approve the palette, the reading sizes and the opening — or name what to change. Phase 2
+    rebuilds the hero and the first chapter plate against this layer.
+  </p>
+</main>
+
+<script type="module" src="./phase1.js"></script>
+</body>
+</html>

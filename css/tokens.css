@@ -1,0 +1,335 @@
+/* ============================================================
+   Ecocure — Field Guide foundations · Phase 1
+   The single token layer for the rewritten site.
+   Art direction: Frame A "The Paper Edition", with the plate
+   that opens to full bleed from Frame B.
+
+   One trio, self-hosted (5 woff2, 220 KB, latin subset):
+   Fraunces · Instrument Sans · Martian Mono.
+   No Google Fonts request in production.
+   ============================================================ */
+
+/* ---------- Typefaces ---------- */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces-normal.woff2") format("woff2");
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces-italic.woff2") format("woff2");
+  font-weight: 300 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("../fonts/instrument-sans-normal.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("../fonts/instrument-sans-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("../fonts/martian-mono-normal.woff2") format("woff2");
+  font-weight: 300 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Tokens ---------- */
+
+:root {
+  /* ── Colour: paper edition ───────────────────────────────
+     Four printed values. Everything else is derived from ink
+     so a tint can never drift away from the palette. */
+  --fig-paper: #f4efe2;
+  --fig-paper-raised: #fbf7ec;
+  --fig-paper-shade: #ece4d1;
+  --fig-ink: #1a1c13;
+  --fig-moss: #4d6330;
+  --fig-clay: #9a4f2b;
+  --fig-night: #0d1009;
+  --fig-on-plate: var(--fig-paper);
+
+  /* ── Colour: derived ─────────────────────────────────────
+     Contrast on paper: ink 15.0:1 · moss 5.8:1 · clay 5.2:1 */
+  --fig-ink-78: color-mix(in srgb, var(--fig-ink) 78%, transparent);
+  --fig-ink-62: color-mix(in srgb, var(--fig-ink) 62%, transparent);
+  --fig-ink-48: color-mix(in srgb, var(--fig-ink) 48%, transparent);
+  --fig-ink-32: color-mix(in srgb, var(--fig-ink) 32%, transparent);
+  --fig-rule: color-mix(in srgb, var(--fig-ink) 18%, transparent);
+  --fig-rule-strong: color-mix(in srgb, var(--fig-ink) 34%, transparent);
+  --fig-plate-scrim: color-mix(in srgb, var(--fig-night) 68%, transparent);
+
+  /* ── Type: families ─────────────────────────────────────── */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-text: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ── Type: scale ─────────────────────────────────────────
+     Specimen sizes are measured live on styleframes/phase1.html.
+     A +1px step over the comp is deliberate: the frame was drawn
+     at a 15px root, the site must read at 16px. */
+  --type-hero: clamp(2.9rem, 6.9vw, 6.9rem);
+  --type-h2: clamp(2.05rem, 3.4vw, 3.05rem);
+  --type-h3: clamp(1.45rem, 1.9vw, 1.85rem);
+  --type-figure: clamp(1.5rem, 2.1vw, 2rem);
+  --type-title: 1.0625rem;
+  --type-lede: clamp(1.0625rem, 1.15vw, 1.1875rem);
+  --type-body: 1rem;
+  --type-small: 0.875rem;
+  --type-label: 0.75rem;
+  --type-meta: 0.6875rem;
+  --type-micro: 0.625rem;
+
+  /* ── Type: rhythm ───────────────────────────────────────── */
+  --leading-hero: 0.86;
+  --leading-tight: 0.98;
+  --leading-snug: 1.15;
+  --leading-lede: 1.6;
+  --leading-body: 1.65;
+  --leading-mono: 1.45;
+
+  --track-hero: -0.038em;
+  --track-display: -0.024em;
+  --track-title: -0.012em;
+  --track-label: 0.16em;
+  --track-meta: 0.14em;
+  --track-micro: 0.18em;
+
+  /* Line lengths: lede 33ch, body 36ch, printed note 38ch. */
+  --measure-lede: 33ch;
+  --measure-body: 36ch;
+  --measure-note: 38ch;
+  --measure-wide: 56ch;
+
+  /* ── Space: 4px grid ────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  --pad-page: clamp(1.25rem, 4.2vw, 3.625rem);
+  --pad-section: clamp(2.5rem, 5vw, 4.5rem);
+  --header-h: 4.5rem;
+
+  /* ── Rules, radius, motion ──────────────────────────────── */
+  --hairline: 1px;
+  --radius: 2px;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --ease-plate: cubic-bezier(0.2, 0.7, 0.15, 1);
+  --dur-fast: 140ms;
+  --dur: 320ms;
+  --dur-slow: 720ms;
+
+  /* ── The plate ───────────────────────────────────────────
+     --plate-open is the only input: 0 = matted print,
+     1 = full bleed. Everything below interpolates from it. */
+  --plate-open: 0;
+  --plate-mat: 10px;
+  --plate-ratio-closed: 1.3333; /* 4:3 print */
+  --plate-ratio-open: 1.7778; /* 16:9 bleed */
+  --plate-bleed: var(--pad-page);
+  --plate-closed-max: 34rem;
+  --plate-run: 100svh;
+}
+
+/* ============================================================
+   Base layer — apply .fig to a page or section that lives on
+   paper. Type utilities below are the whole type system; sections
+   should compose them rather than restate sizes.
+   ============================================================ */
+
+.fig {
+  background: var(--fig-paper);
+  color: var(--fig-ink);
+  font-family: var(--font-text);
+  font-size: var(--type-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fig ::selection {
+  background: var(--fig-moss);
+  color: var(--fig-paper);
+}
+
+.fig :focus-visible {
+  outline: 2px solid var(--fig-moss);
+  outline-offset: 3px;
+}
+
+/* ---- display ---- */
+
+.t-hero,
+.t-h2,
+.t-h3,
+.t-figure {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+.t-hero {
+  font-size: var(--type-hero);
+  line-height: var(--leading-hero);
+  letter-spacing: var(--track-hero);
+}
+
+.t-h2 {
+  font-size: var(--type-h2);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+}
+
+.t-h3 {
+  font-size: var(--type-h3);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--track-title);
+}
+
+.t-figure {
+  font-size: var(--type-figure);
+  line-height: 1;
+  letter-spacing: var(--track-title);
+}
+
+.t-hero em,
+.t-h2 em,
+.t-h3 em {
+  font-style: italic;
+  color: var(--fig-clay);
+}
+
+/* ---- text ---- */
+
+.t-lede,
+.t-body,
+.t-small,
+.t-title {
+  margin: 0;
+  font-family: var(--font-text);
+}
+
+.t-lede {
+  max-width: var(--measure-lede);
+  font-size: var(--type-lede);
+  line-height: var(--leading-lede);
+  color: var(--fig-ink-78);
+}
+
+.t-body {
+  max-width: var(--measure-body);
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+  color: var(--fig-ink-78);
+}
+
+.t-small {
+  font-size: var(--type-small);
+  line-height: 1.55;
+  color: var(--fig-ink-62);
+}
+
+.t-title {
+  font-size: var(--type-title);
+  line-height: 1.3;
+  letter-spacing: var(--track-title);
+}
+
+.measure-wide {
+  max-width: var(--measure-wide);
+}
+
+.measure-none {
+  max-width: none;
+}
+
+/* ---- mono: labels, figures, coordinates ---- */
+
+.t-label,
+.t-meta,
+.t-micro {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  line-height: var(--leading-mono);
+  text-transform: uppercase;
+}
+
+.t-label {
+  font-size: var(--type-label);
+  letter-spacing: var(--track-label);
+}
+
+.t-meta {
+  font-size: var(--type-meta);
+  letter-spacing: var(--track-meta);
+  color: var(--fig-ink-62);
+}
+
+.t-micro {
+  font-size: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--fig-ink-48);
+}
+
+.t-label--moss {
+  color: var(--fig-moss);
+}
+
+.t-label--clay {
+  color: var(--fig-clay);
+}
+
+/* ---- shared furniture ---- */
+
+.rule-top {
+  border-top: var(--hairline) solid var(--fig-rule);
+}
+
+.rule-bottom {
+  border-bottom: var(--hairline) solid var(--fig-rule);
+}
+
+.fig-mark {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+  color: var(--fig-moss);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
